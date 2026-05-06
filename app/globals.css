@@ -26,7 +26,19 @@ body {
     radial-gradient(circle at 20% 10%, rgba(212, 160, 76, 0.08) 0%, transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(90, 111, 74, 0.06) 0%, transparent 40%);
   min-height: 100vh;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
+
+/* Prevent iOS zoom on input focus — inputs must be at least 16px */
+input, select, textarea {
+  font-size: 16px;
+}
+
+/* Safe-area helpers for iPhone notch / home indicator */
+.safe-top { padding-top: env(safe-area-inset-top); }
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
 
 .font-display { font-family: 'Fraunces', serif; }
 .font-mono { font-family: 'JetBrains Mono', monospace; }

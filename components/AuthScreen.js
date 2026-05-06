@@ -32,16 +32,16 @@ export default function AuthScreen() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="min-h-screen flex items-center justify-center px-5 sm:px-6 py-8">
       <div className="max-w-md w-full">
-        <div className="mb-12 text-center animate-fade-in">
-          <div className="inline-block px-3 py-1 bg-ink text-cream font-mono text-[10px] uppercase tracking-[0.3em] rounded-full mb-6">
+        <div className="mb-10 sm:mb-12 text-center animate-fade-in">
+          <div className="inline-block px-3 py-1 bg-ink text-cream font-mono text-[10px] uppercase tracking-[0.3em] rounded-full mb-5 sm:mb-6">
             est. 2025
           </div>
-          <h1 className="font-display text-7xl italic font-light text-ink leading-none">
+          <h1 className="font-display text-6xl sm:text-7xl italic font-light text-ink leading-none">
             Budgetly
           </h1>
-          <p className="font-display italic text-ink/50 mt-4 text-lg">
+          <p className="font-display italic text-ink/50 mt-3 sm:mt-4 text-base sm:text-lg">
             your money, on paper.
           </p>
         </div>

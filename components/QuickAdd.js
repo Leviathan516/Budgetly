@@ -47,18 +47,18 @@ export default function QuickAdd({ onAdded, userId }) {
 
   return (
     <div className="max-w-xl mx-auto">
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">new entry</div>
-        <h2 className="font-display text-4xl italic font-light">Quick add.</h2>
+        <h2 className="font-display text-3xl sm:text-4xl italic font-light">Quick add.</h2>
       </div>
 
-      <form onSubmit={submit} className="space-y-6">
+      <form onSubmit={submit} className="space-y-5 sm:space-y-6">
         {/* Type toggle */}
         <div className="flex gap-px bg-ink/10 p-px">
           <button
             type="button"
             onClick={() => setType('expense')}
-            className={`flex-1 py-3 font-display text-lg italic transition-all ${
+            className={`flex-1 py-3 font-display text-base sm:text-lg italic transition-all ${
               type === 'expense' ? 'bg-rust text-cream' : 'bg-paper text-ink/60'
             }`}
           >
@@ -67,7 +67,7 @@ export default function QuickAdd({ onAdded, userId }) {
           <button
             type="button"
             onClick={() => setType('income')}
-            className={`flex-1 py-3 font-display text-lg italic transition-all ${
+            className={`flex-1 py-3 font-display text-base sm:text-lg italic transition-all ${
               type === 'income' ? 'bg-moss text-cream' : 'bg-paper text-ink/60'
             }`}
           >
@@ -75,19 +75,20 @@ export default function QuickAdd({ onAdded, userId }) {
           </button>
         </div>
 
-        {/* Amount, hero input */}
-        <div className="border-b-2 border-ink py-4">
+        {/* Amount */}
+        <div className="border-b-2 border-ink py-3 sm:py-4">
           <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">amount</div>
           <div className="flex items-baseline gap-2">
-            <span className="font-display text-5xl text-ink/30">$</span>
+            <span className="font-display text-3xl sm:text-5xl text-ink/30">$</span>
             <input
               type="number"
+              inputMode="decimal"
               step="0.01"
               required
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
-              className="flex-1 bg-transparent font-display text-5xl italic font-light placeholder-ink/20 focus:outline-none"
+              className="flex-1 min-w-0 bg-transparent font-display text-3xl sm:text-5xl italic font-light placeholder-ink/20 focus:outline-none"
             />
           </div>
         </div>
@@ -106,7 +107,7 @@ export default function QuickAdd({ onAdded, userId }) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="font-mono text-[10px] uppercase tracking-widest text-ink/60 block mb-2">
               category
@@ -135,8 +136,8 @@ export default function QuickAdd({ onAdded, userId }) {
         <button
           type="submit"
           disabled={saving}
-          className={`w-full py-4 font-display text-lg italic text-cream transition-all ${
-            done ? 'bg-moss' : type === 'income' ? 'bg-moss hover:bg-ink' : 'bg-ink hover:bg-rust'
+          className={`w-full py-4 font-display text-base sm:text-lg italic text-cream transition-all ${
+            done ? 'bg-moss' : type === 'income' ? 'bg-moss hover:bg-ink active:bg-ink' : 'bg-ink hover:bg-rust active:bg-rust'
           }`}
         >
           {done ? <span className="flex items-center justify-center gap-2"><Check size={20} /> saved</span> :

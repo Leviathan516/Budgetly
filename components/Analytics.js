@@ -2,12 +2,11 @@
 
 import { useMemo } from 'react';
 import { BarChart, Bar, PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
-import { format, subDays, eachDayOfInterval, startOfMonth, parseISO } from 'date-fns';
+import { format, subDays, eachDayOfInterval, startOfMonth } from 'date-fns';
 
 const PALETTE = ['#c4633f', '#5a6f4a', '#d4a04c', '#1a1a1a', '#8b6f47', '#a87b5d', '#6b8e7f', '#b8956a'];
 
 export default function Analytics({ transactions = [], recurring = [] }) {
-  // Last 30 days daily
   const dailyData = useMemo(() => {
     const days = eachDayOfInterval({ start: subDays(new Date(), 29), end: new Date() });
     return days.map(day => {
@@ -15,11 +14,10 @@ export default function Analytics({ transactions = [], recurring = [] }) {
       const dayTx = transactions.filter(t => t.date === key);
       const expense = dayTx.filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
       const income = dayTx.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0);
-      return { date: format(day, 'MMM d'), expense, income };
+      return { date: format(day, 'M/d'), expense, income };
     });
   }, [transactions]);
 
-  // By category, this month
   const categoryData = useMemo(() => {
     const monthStart = startOfMonth(new Date());
     const map = {};
@@ -33,7 +31,6 @@ export default function Analytics({ transactions = [], recurring = [] }) {
       .sort((a, b) => b.value - a.value);
   }, [transactions]);
 
-  // Running balance over 30 days
   const balanceData = useMemo(() => {
     const days = eachDayOfInterval({ start: subDays(new Date(), 29), end: new Date() });
     let balance = 0;
@@ -42,7 +39,7 @@ export default function Analytics({ transactions = [], recurring = [] }) {
       const dayTx = transactions.filter(t => t.date === key);
       const net = dayTx.reduce((s, t) => s + (t.type === 'income' ? Number(t.amount) : -Number(t.amount)), 0);
       balance += net;
-      return { date: format(day, 'MMM d'), balance: Math.round(balance * 100) / 100 };
+      return { date: format(day, 'M/d'), balance: Math.round(balance * 100) / 100 };
     });
   }, [transactions]);
 
@@ -51,61 +48,58 @@ export default function Analytics({ transactions = [], recurring = [] }) {
 
   return (
     <div>
-      <div className="mb-8">
+      <div className="mb-6 sm:mb-8">
         <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">the ledger reviewed</div>
-        <h2 className="font-display text-4xl italic font-light">Analytics.</h2>
+        <h2 className="font-display text-3xl sm:text-4xl italic font-light">Analytics.</h2>
       </div>
 
       {transactions.length === 0 ? (
-        <div className="text-center py-20 font-display italic text-ink/40 text-xl">
+        <div className="text-center py-20 font-display italic text-ink/40 text-lg sm:text-xl px-6">
           add some entries to see the picture take shape.
         </div>
       ) : (
-        <div className="space-y-8">
-          {/* Headline numbers */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-px bg-ink/10 border border-ink/10">
+        <div className="space-y-6 sm:space-y-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-ink/10 border border-ink/10">
             <Headline label="entries" value={transactions.length} />
             <Headline label="categories" value={categoryData.length} />
-            <Headline label="top category" value={topCategory?.name || '—'} />
+            <Headline label="top" value={topCategory?.name || '—'} />
             <Headline label="month spend" value={`$${totalSpent.toFixed(0)}`} accent="rust" />
           </div>
 
-          {/* Income vs Expense bar */}
           <Panel title="Daily flow" subtitle="last 30 days">
-            <ResponsiveContainer width="100%" height={240}>
-              <BarChart data={dailyData}>
-                <XAxis dataKey="date" tick={{ fontSize: 10, fontFamily: 'JetBrains Mono' }} interval={4} stroke="#1a1a1a40" />
-                <YAxis tick={{ fontSize: 10, fontFamily: 'JetBrains Mono' }} stroke="#1a1a1a40" />
-                <Tooltip contentStyle={{ background: '#faf7f0', border: '1px solid #1a1a1a20', fontFamily: 'JetBrains Mono', fontSize: 12 }} />
+            <ResponsiveContainer width="100%" height={200}>
+              <BarChart data={dailyData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                <XAxis dataKey="date" tick={{ fontSize: 9, fontFamily: 'JetBrains Mono' }} interval={4} stroke="#1a1a1a40" />
+                <YAxis tick={{ fontSize: 9, fontFamily: 'JetBrains Mono' }} stroke="#1a1a1a40" />
+                <Tooltip contentStyle={{ background: '#faf7f0', border: '1px solid #1a1a1a20', fontFamily: 'JetBrains Mono', fontSize: 11 }} />
                 <Bar dataKey="income" fill="#5a6f4a" />
                 <Bar dataKey="expense" fill="#c4633f" />
               </BarChart>
             </ResponsiveContainer>
           </Panel>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Category breakdown */}
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
             <Panel title="By category" subtitle="this month">
               {categoryData.length === 0 ? (
                 <div className="font-display italic text-ink/40 py-8 text-center">no expenses yet this month.</div>
               ) : (
                 <>
-                  <ResponsiveContainer width="100%" height={220}>
+                  <ResponsiveContainer width="100%" height={200}>
                     <PieChart>
-                      <Pie data={categoryData} dataKey="value" cx="50%" cy="50%" outerRadius={80} innerRadius={50}>
+                      <Pie data={categoryData} dataKey="value" cx="50%" cy="50%" outerRadius={70} innerRadius={45}>
                         {categoryData.map((_, i) => <Cell key={i} fill={PALETTE[i % PALETTE.length]} />)}
                       </Pie>
-                      <Tooltip contentStyle={{ background: '#faf7f0', border: '1px solid #1a1a1a20', fontFamily: 'JetBrains Mono', fontSize: 12 }} />
+                      <Tooltip contentStyle={{ background: '#faf7f0', border: '1px solid #1a1a1a20', fontFamily: 'JetBrains Mono', fontSize: 11 }} />
                     </PieChart>
                   </ResponsiveContainer>
                   <div className="space-y-1.5 mt-4">
                     {categoryData.slice(0, 6).map((c, i) => (
-                      <div key={c.name} className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full" style={{ background: PALETTE[i % PALETTE.length] }} />
-                          <span className="font-mono text-xs uppercase tracking-wider">{c.name}</span>
+                      <div key={c.name} className="flex items-center justify-between text-sm gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-2 h-2 rounded-full shrink-0" style={{ background: PALETTE[i % PALETTE.length] }} />
+                          <span className="font-mono text-[11px] sm:text-xs uppercase tracking-wider truncate">{c.name}</span>
                         </div>
-                        <span className="font-mono text-xs">${c.value.toFixed(2)}</span>
+                        <span className="font-mono text-[11px] sm:text-xs whitespace-nowrap">${c.value.toFixed(2)}</span>
                       </div>
                     ))}
                   </div>
@@ -113,13 +107,12 @@ export default function Analytics({ transactions = [], recurring = [] }) {
               )}
             </Panel>
 
-            {/* Running balance */}
             <Panel title="Running net" subtitle="last 30 days">
-              <ResponsiveContainer width="100%" height={220}>
-                <LineChart data={balanceData}>
-                  <XAxis dataKey="date" tick={{ fontSize: 10, fontFamily: 'JetBrains Mono' }} interval={4} stroke="#1a1a1a40" />
-                  <YAxis tick={{ fontSize: 10, fontFamily: 'JetBrains Mono' }} stroke="#1a1a1a40" />
-                  <Tooltip contentStyle={{ background: '#faf7f0', border: '1px solid #1a1a1a20', fontFamily: 'JetBrains Mono', fontSize: 12 }} />
+              <ResponsiveContainer width="100%" height={200}>
+                <LineChart data={balanceData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
+                  <XAxis dataKey="date" tick={{ fontSize: 9, fontFamily: 'JetBrains Mono' }} interval={4} stroke="#1a1a1a40" />
+                  <YAxis tick={{ fontSize: 9, fontFamily: 'JetBrains Mono' }} stroke="#1a1a1a40" />
+                  <Tooltip contentStyle={{ background: '#faf7f0', border: '1px solid #1a1a1a20', fontFamily: 'JetBrains Mono', fontSize: 11 }} />
                   <Line type="monotone" dataKey="balance" stroke="#1a1a1a" strokeWidth={2} dot={false} />
                 </LineChart>
               </ResponsiveContainer>
@@ -133,18 +126,18 @@ export default function Analytics({ transactions = [], recurring = [] }) {
 
 function Headline({ label, value, accent }) {
   return (
-    <div className="bg-paper p-5">
-      <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50">{label}</div>
-      <div className={`font-display text-2xl mt-1 ${accent === 'rust' ? 'text-rust' : ''}`}>{value}</div>
+    <div className="bg-paper p-3 sm:p-5 min-w-0">
+      <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-ink/50 truncate">{label}</div>
+      <div className={`font-display text-lg sm:text-2xl mt-1 truncate ${accent === 'rust' ? 'text-rust' : ''}`}>{value}</div>
     </div>
   );
 }
 
 function Panel({ title, subtitle, children }) {
   return (
-    <div className="border border-ink/10 bg-paper p-6">
+    <div className="border border-ink/10 bg-paper p-4 sm:p-6">
       <div className="mb-4">
-        <h3 className="font-display text-2xl italic">{title}</h3>
+        <h3 className="font-display text-xl sm:text-2xl italic">{title}</h3>
         <div className="font-mono text-[10px] uppercase tracking-widest text-ink/40">{subtitle}</div>
       </div>
       {children}
