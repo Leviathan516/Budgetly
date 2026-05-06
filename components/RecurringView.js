@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Plus, Trash2, Calendar as CalIcon, X } from 'lucide-react';
 import { addWeeks, addMonths, parseISO, differenceInDays, format } from 'date-fns';
@@ -126,6 +126,12 @@ function RecurringForm({ onClose, onSaved, userId }) {
   const [nextDate, setNextDate] = useState(new Date().toISOString().split('T')[0]);
   const [saving, setSaving] = useState(false);
 
+  // Hide bottom tab bar while this modal is open
+  useEffect(() => {
+    document.body.classList.add('modal-open');
+    return () => document.body.classList.remove('modal-open');
+  }, []);
+
   const submit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -147,7 +153,7 @@ function RecurringForm({ onClose, onSaved, userId }) {
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-4 animate-fade-in" onClick={onClose}>
       <div className="absolute inset-0 bg-ink/50 backdrop-blur-sm" />
       <div
-        className="relative w-full sm:max-w-lg max-h-[90vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10"
+        className="relative w-full sm:max-w-lg max-h-[100dvh] sm:max-h-[90vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10"
         style={{ backgroundColor: '#faf7f0' }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -164,7 +170,7 @@ function RecurringForm({ onClose, onSaved, userId }) {
           </button>
         </div>
 
-        <form onSubmit={submit} className="p-5 sm:p-6 pb-8 space-y-4">
+        <form onSubmit={submit} className="p-5 sm:p-6 space-y-4 pb-[calc(5rem+env(safe-area-inset-bottom))] sm:pb-8">
           <div className="flex gap-px bg-ink/10 p-px">
             <button type="button" onClick={() => { setType('income'); setCategory('paycheck'); }}
               className={`flex-1 py-2.5 font-display italic ${type === 'income' ? 'bg-moss text-cream' : 'bg-paper'}`}>
