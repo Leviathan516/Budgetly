@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import dynamic from 'next/dynamic';
 import { supabase } from '@/lib/supabase';
-import AuthScreen from '@/components/AuthScreen';
-import Dashboard from '@/components/Dashboard';
+
+const AuthScreen = dynamic(() => import('@/components/AuthScreen'), { ssr: false });
+const Dashboard = dynamic(() => import('@/components/Dashboard'), { ssr: false });
 
 export default function Home() {
   const [session, setSession] = useState(null);
