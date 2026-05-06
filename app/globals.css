@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Geist:wght@300..900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #1a1a1a;
+  --cream: #f4f0e8;
+  --moss: #5a6f4a;
+  --rust: #c4633f;
+  --ochre: #d4a04c;
+  --paper: #faf7f0;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: 'Geist', system-ui, sans-serif;
+  background-image:
+    radial-gradient(circle at 20% 10%, rgba(212, 160, 76, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 80% 80%, rgba(90, 111, 74, 0.06) 0%, transparent 40%);
+  min-height: 100vh;
+}
+
+.font-display { font-family: 'Fraunces', serif; }
+.font-mono { font-family: 'JetBrains Mono', monospace; }
+
+/* Grain texture overlay */
+.grain::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  z-index: 100;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Smooth focus rings */
+button:focus-visible, input:focus-visible, select:focus-visible {
+  outline: 2px solid var(--rust);
+  outline-offset: 2px;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(26,26,26,0.15); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(26,26,26,0.3); }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up { animation: slideUp 0.4s ease-out forwards; }
+.animate-fade-in { animation: fadeIn 0.3s ease-out forwards; }
