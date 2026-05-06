@@ -102,7 +102,7 @@ export default function Dashboard({ session }) {
         )}
       </main>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-md border-t border-ink/10 z-40 safe-bottom">
+      <nav className="tab-bar fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-md border-t border-ink/10 z-40 safe-bottom">
         <div className="max-w-6xl mx-auto px-1 sm:px-2 py-1.5 sm:py-2 flex justify-around">
           {TABS.map(t => {
             const Icon = t.icon;
