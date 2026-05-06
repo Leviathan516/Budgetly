@@ -10,11 +10,11 @@ import Analytics from './Analytics';
 import ReceiptScanner from './ReceiptScanner';
 
 const TABS = [
-  { id: 'calendar', label: 'Calendar', icon: Calendar },
-  { id: 'add', label: 'Quick Add', icon: Plus },
-  { id: 'recurring', label: 'Recurring', icon: Repeat },
-  { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { id: 'receipt', label: 'Receipt', icon: Camera },
+  { id: 'calendar', label: 'Calendar', short: 'Cal', icon: Calendar },
+  { id: 'add', label: 'Quick Add', short: 'Add', icon: Plus },
+  { id: 'recurring', label: 'Recurring', short: 'Loop', icon: Repeat },
+  { id: 'analytics', label: 'Analytics', short: 'Stats', icon: BarChart3 },
+  { id: 'receipt', label: 'Receipt', short: 'Scan', icon: Camera },
 ];
 
 export default function Dashboard({ session }) {
@@ -49,7 +49,6 @@ export default function Dashboard({ session }) {
     await supabase.auth.signOut();
   };
 
-  // Top-level totals for header
   const monthStart = new Date();
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
@@ -60,36 +59,36 @@ export default function Dashboard({ session }) {
   const net = earned - spent;
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-safe">
       {/* Header */}
-      <header className="border-b border-ink/10 bg-paper/80 backdrop-blur-md sticky top-0 z-40">
-        <div className="max-w-6xl mx-auto px-6 py-5 flex items-center justify-between">
-          <div>
-            <h1 className="font-display text-3xl italic font-light leading-none">Budgetly</h1>
-            <p className="font-mono text-[10px] uppercase tracking-widest text-ink/40 mt-1">
+      <header className="border-b border-ink/10 bg-paper/90 backdrop-blur-md sticky top-0 z-40 safe-top">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-3 sm:py-5 flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <h1 className="font-display text-2xl sm:text-3xl italic font-light leading-none">Budgetly</h1>
+            <p className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-ink/40 mt-1 truncate">
               {session.user.email}
             </p>
           </div>
           <button
             onClick={handleSignOut}
-            className="font-mono text-xs uppercase tracking-widest text-ink/50 hover:text-rust flex items-center gap-2"
+            aria-label="Sign out"
+            className="font-mono text-[10px] sm:text-xs uppercase tracking-widest text-ink/50 hover:text-rust active:text-rust flex items-center gap-1.5 sm:gap-2 shrink-0 px-2 py-1"
           >
-            <LogOut size={14} /> sign out
+            <LogOut size={14} />
+            <span className="hidden sm:inline">sign out</span>
           </button>
         </div>
 
-        {/* Monthly summary banner */}
-        <div className="max-w-6xl mx-auto px-6 pb-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-4 sm:pb-6">
           <div className="grid grid-cols-3 gap-px bg-ink/10 border border-ink/10">
-            <Stat label="Earned this month" value={`$${earned.toFixed(2)}`} accent="moss" />
-            <Stat label="Spent this month" value={`$${spent.toFixed(2)}`} accent="rust" />
-            <Stat label="Net" value={`${net >= 0 ? '+' : ''}$${net.toFixed(2)}`} accent={net >= 0 ? 'moss' : 'rust'} />
+            <Stat label="Earned" fullLabel="Earned this month" value={earned} accent="moss" />
+            <Stat label="Spent" fullLabel="Spent this month" value={spent} accent="rust" />
+            <Stat label="Net" fullLabel="Net" value={net} accent={net >= 0 ? 'moss' : 'rust'} signed />
           </div>
         </div>
       </header>
 
-      {/* Main content */}
-      <main className="max-w-6xl mx-auto px-6 py-8">
+      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {loading ? (
           <div className="text-center py-20 font-display italic text-ink/40 text-xl">loading your records…</div>
         ) : (
@@ -103,9 +102,8 @@ export default function Dashboard({ session }) {
         )}
       </main>
 
-      {/* Bottom tab bar */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-md border-t border-ink/10 z-40">
-        <div className="max-w-6xl mx-auto px-2 py-2 flex justify-around">
+      <nav className="fixed bottom-0 left-0 right-0 bg-paper/95 backdrop-blur-md border-t border-ink/10 z-40 safe-bottom">
+        <div className="max-w-6xl mx-auto px-1 sm:px-2 py-1.5 sm:py-2 flex justify-around">
           {TABS.map(t => {
             const Icon = t.icon;
             const active = tab === t.id;
@@ -113,12 +111,14 @@ export default function Dashboard({ session }) {
               <button
                 key={t.id}
                 onClick={() => setTab(t.id)}
-                className={`flex flex-col items-center gap-1 px-3 py-2 transition-colors ${
-                  active ? 'text-rust' : 'text-ink/50 hover:text-ink'
+                aria-label={t.label}
+                className={`flex flex-col items-center gap-0.5 sm:gap-1 px-2 sm:px-3 py-1.5 sm:py-2 transition-colors min-w-0 flex-1 max-w-[100px] ${
+                  active ? 'text-rust' : 'text-ink/50 hover:text-ink active:text-ink'
                 }`}
               >
-                <Icon size={18} strokeWidth={active ? 2.5 : 1.5} />
-                <span className="font-mono text-[9px] uppercase tracking-widest">{t.label}</span>
+                <Icon size={20} strokeWidth={active ? 2.5 : 1.5} />
+                <span className="font-mono text-[9px] uppercase tracking-widest hidden sm:inline">{t.label}</span>
+                <span className="font-mono text-[9px] uppercase tracking-widest sm:hidden">{t.short}</span>
               </button>
             );
           })}
@@ -128,15 +128,23 @@ export default function Dashboard({ session }) {
   );
 }
 
-function Stat({ label, value, accent }) {
-  const colors = {
-    moss: 'text-moss',
-    rust: 'text-rust',
-  };
+function Stat({ label, fullLabel, value, accent, signed }) {
+  const colors = { moss: 'text-moss', rust: 'text-rust' };
+  const abs = Math.abs(value);
+  const sign = signed && value >= 0 ? '+' : signed && value < 0 ? '-' : '';
+  const display = abs >= 1000
+    ? `${sign}$${Math.round(abs).toLocaleString()}`
+    : `${sign}$${abs.toFixed(2)}`;
+
   return (
-    <div className="bg-paper p-5">
-      <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">{label}</div>
-      <div className={`font-display text-3xl font-light ${colors[accent] || 'text-ink'}`}>{value}</div>
+    <div className="bg-paper p-3 sm:p-5 min-w-0">
+      <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-ink/50 mb-1 sm:mb-2 truncate">
+        <span className="sm:hidden">{label}</span>
+        <span className="hidden sm:inline">{fullLabel}</span>
+      </div>
+      <div className={`font-display text-xl sm:text-3xl font-light truncate ${colors[accent] || 'text-ink'}`}>
+        {display}
+      </div>
     </div>
   );
 }
