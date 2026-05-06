@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
   eachDayOfInterval, addMonths, subMonths, addWeeks, subWeeks,
@@ -77,16 +77,43 @@ export default function CalendarView({ transactions }) {
       {view === 'week' && <WeekStrip cursor={cursor} dailyTotal={dailyTotal} onSelect={setSelected} txByDate={txByDate} />}
       {view === 'day' && <DayDetail date={cursor} txByDate={txByDate} />}
 
-      {/* Selected day modal/panel */}
+      {/* Selected day modal */}
       {selected && (
-        <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in" onClick={() => setSelected(null)}>
-          <div className="bg-paper max-w-lg w-full p-8 max-h-[80vh] overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
-            <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">{format(selected, 'EEEE')}</div>
-            <h3 className="font-display text-3xl italic mb-6">{format(selected, 'MMMM d')}</h3>
-            <DayDetail date={selected} txByDate={txByDate} />
-            <button onClick={() => setSelected(null)} className="mt-6 font-mono text-xs uppercase tracking-widest text-ink/60 hover:text-ink">
-              ← close
-            </button>
+        <div
+          className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in"
+          onClick={() => setSelected(null)}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-ink/50 backdrop-blur-sm" />
+
+          {/* Card */}
+          <div
+            className="relative bg-paper max-w-lg w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Card header */}
+            <div className="flex items-start justify-between p-6 pb-4 border-b border-ink/10 sticky top-0 bg-paper z-10">
+              <div>
+                <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-1">
+                  {format(selected, 'EEEE')}
+                </div>
+                <h3 className="font-display text-3xl italic font-light leading-none">
+                  {format(selected, 'MMMM d')}
+                </h3>
+              </div>
+              <button
+                onClick={() => setSelected(null)}
+                aria-label="Close"
+                className="w-8 h-8 flex items-center justify-center text-ink/50 hover:text-ink hover:bg-ink/5 transition-colors -mt-1 -mr-1"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Card body */}
+            <div className="p-6">
+              <DayDetail date={selected} txByDate={txByDate} />
+            </div>
           </div>
         </div>
       )}
