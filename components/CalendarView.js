@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import {
   format, startOfMonth, endOfMonth, startOfWeek, endOfWeek,
@@ -12,6 +12,13 @@ export default function CalendarView({ transactions = [] }) {
   const [view, setView] = useState('month');
   const [cursor, setCursor] = useState(new Date());
   const [selected, setSelected] = useState(null);
+
+  // Hide bottom tab bar when day-detail modal is open
+  useEffect(() => {
+    if (selected) document.body.classList.add('modal-open');
+    else document.body.classList.remove('modal-open');
+    return () => document.body.classList.remove('modal-open');
+  }, [selected]);
 
   const txByDate = useMemo(() => {
     const map = {};
