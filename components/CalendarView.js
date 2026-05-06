@@ -88,11 +88,15 @@ export default function CalendarView({ transactions = [] }) {
 
           {/* Card */}
           <div
-            className="relative bg-paper max-w-lg w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10"
+            className="relative max-w-lg w-full max-h-[85vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10"
+            style={{ backgroundColor: '#faf7f0' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Card header */}
-            <div className="flex items-start justify-between p-6 pb-4 border-b border-ink/10 sticky top-0 bg-paper z-10">
+            <div
+              className="flex items-start justify-between p-6 pb-4 border-b border-ink/10 sticky top-0 z-10"
+              style={{ backgroundColor: '#faf7f0' }}
+            >
               <div>
                 <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-1">
                   {format(selected, 'EEEE')}
