@@ -8,7 +8,7 @@ import {
   addDays, subDays, isSameDay, isSameMonth, parseISO,
 } from 'date-fns';
 
-export default function CalendarView({ transactions = [] }) {
+export default function CalendarView({ transactions = [], recurring = [] }) {
   const [view, setView] = useState('month');
   const [cursor, setCursor] = useState(new Date());
   const [selected, setSelected] = useState(null);
@@ -20,15 +20,52 @@ export default function CalendarView({ transactions = [] }) {
     return () => document.body.classList.remove('modal-open');
   }, [selected]);
 
+  // Project recurring entries into virtual transactions for ±6 months
+  // around today so they show up on the calendar.
+  const projectedRecurring = useMemo(() => {
+    const out = [];
+    const windowStart = subMonths(new Date(), 6);
+    const windowEnd = addMonths(new Date(), 6);
+
+    recurring.forEach(r => {
+      if (r.active === false) return;
+      let occur = parseISO(r.next_date);
+      // Walk backwards from next_date to fill in past occurrences
+      let back = occur;
+      while (back >= windowStart) {
+        if (back >= windowStart && back <= windowEnd) {
+          out.push(makeVirtual(r, back));
+        }
+        if (r.frequency === 'weekly') back = subWeeks(back, 1);
+        else if (r.frequency === 'biweekly') back = subWeeks(back, 2);
+        else if (r.frequency === 'monthly') back = subMonths(back, 1);
+        else break;
+      }
+      // Walk forwards from next_date to fill in future occurrences
+      let fwd = occur;
+      if (r.frequency === 'weekly') fwd = addWeeks(fwd, 1);
+      else if (r.frequency === 'biweekly') fwd = addWeeks(fwd, 2);
+      else if (r.frequency === 'monthly') fwd = addMonths(fwd, 1);
+      while (fwd <= windowEnd) {
+        out.push(makeVirtual(r, fwd));
+        if (r.frequency === 'weekly') fwd = addWeeks(fwd, 1);
+        else if (r.frequency === 'biweekly') fwd = addWeeks(fwd, 2);
+        else if (r.frequency === 'monthly') fwd = addMonths(fwd, 1);
+        else break;
+      }
+    });
+    return out;
+  }, [recurring]);
+
   const txByDate = useMemo(() => {
     const map = {};
-    transactions.forEach(t => {
+    [...transactions, ...projectedRecurring].forEach(t => {
       const key = t.date;
       if (!map[key]) map[key] = [];
       map[key].push(t);
     });
     return map;
-  }, [transactions]);
+  }, [transactions, projectedRecurring]);
 
   const dailyTotal = (date) => {
     const key = format(date, 'yyyy-MM-dd');
@@ -253,10 +290,17 @@ function TransactionRow({ tx }) {
   return (
     <div className="flex items-center justify-between py-2 px-1 gap-3">
       <div className="min-w-0 flex-1">
-        <div className="text-sm truncate">{tx.description}</div>
+        <div className="flex items-center gap-2">
+          <span className="text-sm truncate">{tx.description}</span>
+          {tx.scheduled && (
+            <span className="font-mono text-[8px] uppercase tracking-widest text-ink/40 border border-ink/15 px-1 py-0.5 shrink-0">
+              scheduled
+            </span>
+          )}
+        </div>
         <div className="font-mono text-[10px] uppercase tracking-widest text-ink/40">{tx.category}</div>
       </div>
-      <div className={`font-mono text-sm whitespace-nowrap ${tx.type === 'income' ? 'text-moss' : 'text-rust'}`}>
+      <div className={`font-mono text-sm whitespace-nowrap ${tx.type === 'income' ? 'text-moss' : 'text-rust'} ${tx.scheduled ? 'opacity-70' : ''}`}>
         {tx.type === 'income' ? '+' : '−'}${Number(tx.amount).toFixed(2)}
       </div>
     </div>
@@ -268,4 +312,17 @@ function formatCompact(n) {
   if (n >= 1000) return `${(n / 1000).toFixed(1)}k`;
   if (n >= 100) return Math.round(n).toString();
   return n.toFixed(0);
+}
+
+// Build a virtual transaction object from a recurring entry on a given date
+function makeVirtual(r, occurDate) {
+  return {
+    id: `recur-${r.id}-${format(occurDate, 'yyyy-MM-dd')}`,
+    date: format(occurDate, 'yyyy-MM-dd'),
+    type: r.type,
+    amount: r.amount,
+    description: r.description,
+    category: r.category,
+    scheduled: true,
+  };
 }
