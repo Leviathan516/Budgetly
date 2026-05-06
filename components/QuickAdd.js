@@ -9,7 +9,7 @@ const CATEGORIES = [
   'entertainment', 'health', 'shopping', 'subscriptions', 'other',
 ];
 
-export default function QuickAdd({ onAdded, userId }) {
+export default function QuickAdd({ onAdded, userId, embedded = false }) {
   const [type, setType] = useState('expense');
   const [amount, setAmount] = useState('');
   const [description, setDescription] = useState('');
@@ -46,11 +46,13 @@ export default function QuickAdd({ onAdded, userId }) {
   };
 
   return (
-    <div className="max-w-xl mx-auto">
-      <div className="mb-6 sm:mb-8">
-        <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">new entry</div>
-        <h2 className="font-display text-3xl sm:text-4xl italic font-light">Quick add.</h2>
-      </div>
+    <div className={embedded ? '' : 'max-w-xl mx-auto'}>
+      {!embedded && (
+        <div className="mb-6 sm:mb-8">
+          <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">new entry</div>
+          <h2 className="font-display text-3xl sm:text-4xl italic font-light">Quick add.</h2>
+        </div>
+      )}
 
       <form onSubmit={submit} className="space-y-5 sm:space-y-6">
         {/* Type toggle */}
