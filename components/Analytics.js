@@ -6,7 +6,7 @@ import { format, subDays, eachDayOfInterval, startOfMonth, parseISO } from 'date
 
 const PALETTE = ['#c4633f', '#5a6f4a', '#d4a04c', '#1a1a1a', '#8b6f47', '#a87b5d', '#6b8e7f', '#b8956a'];
 
-export default function Analytics({ transactions, recurring }) {
+export default function Analytics({ transactions = [], recurring = [] }) {
   // Last 30 days daily
   const dailyData = useMemo(() => {
     const days = eachDayOfInterval({ start: subDays(new Date(), 29), end: new Date() });
