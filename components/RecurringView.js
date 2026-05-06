@@ -148,7 +148,8 @@ function RecurringForm({ onClose, onSaved, userId }) {
     >
       <div className="absolute inset-0 bg-ink/50 backdrop-blur-sm" />
       <div
-        className="relative bg-paper max-w-lg w-full max-h-[90vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10 p-8"
+        className="relative max-w-lg w-full max-h-[90vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10 p-8"
+        style={{ backgroundColor: '#faf7f0' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">new schedule</div>
