@@ -25,13 +25,22 @@ export default function Dashboard({ session }) {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [tx, rc] = await Promise.all([
-      supabase.from('transactions').select('*').order('date', { ascending: false }),
-      supabase.from('recurring').select('*').order('next_date', { ascending: true }),
-    ]);
-    if (tx.data) setTransactions(tx.data);
-    if (rc.data) setRecurring(rc.data);
-    setLoading(false);
+    try {
+      const [tx, rc] = await Promise.all([
+        supabase.from('transactions').select('*').order('date', { ascending: false }),
+        supabase.from('recurring').select('*').order('next_date', { ascending: true }),
+      ]);
+      if (tx.error) console.error('transactions query error:', tx.error);
+      if (rc.error) console.error('recurring query error:', rc.error);
+      setTransactions(Array.isArray(tx.data) ? tx.data : []);
+      setRecurring(Array.isArray(rc.data) ? rc.data : []);
+    } catch (e) {
+      console.error('loadData failed:', e);
+      setTransactions([]);
+      setRecurring([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { loadData(); }, [loadData]);
