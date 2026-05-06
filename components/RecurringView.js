@@ -7,7 +7,7 @@ import { format, addDays, addWeeks, addMonths, parseISO, differenceInDays } from
 
 const FREQ_LABELS = { weekly: 'every week', biweekly: 'every 2 weeks', monthly: 'every month' };
 
-export default function RecurringView({ recurring, onChange, userId }) {
+export default function RecurringView({ recurring = [], onChange, userId }) {
   const [showForm, setShowForm] = useState(false);
 
   const incomes = recurring.filter(r => r.type === 'income');
@@ -142,8 +142,15 @@ function RecurringForm({ onClose, onSaved, userId }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in" onClick={onClose}>
-      <div className="bg-paper max-w-lg w-full p-8 max-h-[90vh] overflow-y-auto animate-slide-up" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4 animate-fade-in"
+      onClick={onClose}
+    >
+      <div className="absolute inset-0 bg-ink/50 backdrop-blur-sm" />
+      <div
+        className="relative bg-paper max-w-lg w-full max-h-[90vh] overflow-y-auto animate-slide-up shadow-2xl border border-ink/10 p-8"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="font-mono text-[10px] uppercase tracking-widest text-ink/50 mb-2">new schedule</div>
         <h3 className="font-display text-3xl italic mb-6">Add recurring entry.</h3>
 
