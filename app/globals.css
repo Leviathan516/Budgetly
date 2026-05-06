@@ -40,6 +40,10 @@ input, select, textarea {
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 .pb-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 5rem); }
 
+/* Hide bottom tab bar while a modal/sheet is open so it doesn't cover form controls */
+body.modal-open .tab-bar { display: none; }
+body.modal-open { overflow: hidden; }
+
 .font-display { font-family: 'Fraunces', serif; }
 .font-mono { font-family: 'JetBrains Mono', monospace; }
 
